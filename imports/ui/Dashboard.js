@@ -1,16 +1,14 @@
-import React, { Component } from 'react';
-import PrivateHeader from './PrivateHeader';
-class Dashboard extends Component {
-    render() {
-        return (
-            <div>
-                <PrivateHeader title="Real T-notes"/>
-                <div className="page-content">
-                    Dashboard
-                </div>
-            </div>
-        );
-    }
-}
+import React from 'react';
 
-export default Dashboard;
+import PrivateHeader from './PrivateHeader';
+
+export default () => {
+  return (
+    <div>
+      <PrivateHeader title="Dashboard"/>
+      <div className="page-content">
+        Dashboard page content.
+      </div>
+    </div>
+  );
+};

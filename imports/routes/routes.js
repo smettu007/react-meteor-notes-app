@@ -1,48 +1,40 @@
 import { Meteor } from 'meteor/meteor';
 import React from 'react';
-import Login from '../ui/Login';
-import SignUp from '../ui/SignUp';
-import NotFound from '../ui/NotFound';
+import { Router, Route, browserHistory } from 'react-router';
+
+import Signup from '../ui/Signup';
 import Dashboard from '../ui/Dashboard';
-import { Route, Router, browserHistory } from 'react-router';
+import NotFound from '../ui/NotFound';
+import Login from '../ui/Login';
 
-const OnEnterPublicPage = () => {
+const unauthenticatedPages = ['/', '/signup'];
+const authenticatedPages = ['/dashboard'];
+const onEnterPublicPage = () => {
+  if (Meteor.userId()) {
+    browserHistory.replace('/dashboard');
+  }
+};
+const onEnterPrivatePage = () => {
+  if (!Meteor.userId()) {
+    browserHistory.replace('/');
+  }
+};
+export const onAuthChange = (isAuthenticated) => {
+  const pathname = browserHistory.getCurrentLocation().pathname;
+  const isUnauthenticatedPage = unauthenticatedPages.includes(pathname);
+  const isAuthenticatedPage = authenticatedPages.includes(pathname);
 
-    if (Meteor.userId()) {
-        browserHistory.replace('/links')
-    }
-}
-const OnEnterPrivatePage = () => {
-
-    if (!Meteor.userId()) {
-        browserHistory.replace('/')
-    }
-}
-const unAutenticatedPages = ['/', '/signup'];
-const autenticatedPages = ['/Dashboard'];
-
-export const onAuthChange = (isAutenticated) => {
-    const pathname = browserHistory.getCurrentLocation().pathname;
-    const isUnAutenticatedPage = unAutenticatedPages.includes(pathname);
-    const isAutenticatedPage = autenticatedPages.includes(pathname);
-
-    if (isUnAutenticatedPage && isAutenticated) { //if user visits the unautenticated page and is logged in
-        browserHistory.replace("/Dashboard")
-    } else if (isAutenticatedPage && !isAutenticated) {  //if user visits the autenticated page and is not logged in
-        browserHistory.replace('/')
-    }
-}
+  if (isUnauthenticatedPage && isAuthenticated) {
+    browserHistory.replace('/dashboard');
+  } else if (isAuthenticatedPage && !isAuthenticated) {
+    browserHistory.replace('/');
+  }
+};
 export const routes = (
-
-    <Router history={browserHistory}>
-        <Route path="/" component={Login} onEnter={OnEnterPublicPage} />
-        <Route path="/dashboard" component={Dashboard} onEnter={OnEnterPrivatePage} />
-        <Route path="/signup" component={SignUp} onEnter={OnEnterPublicPage} />
-        <Route path="*" component={NotFound} />
-    </Router>
-
-
-)
-
-
-
+  <Router history={browserHistory}>
+    <Route path="/" component={Login} onEnter={onEnterPublicPage}/>
+    <Route path="/signup" component={Signup} onEnter={onEnterPublicPage}/>
+    <Route path="/dashboard" component={Dashboard} onEnter={onEnterPrivatePage}/>
+    <Route path="*" component={NotFound}/>
+  </Router>
+);

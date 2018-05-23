@@ -1,51 +1,49 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router'
-import {Accounts} from "meteor/accounts-base"
+import React from 'react';
+import { Link } from 'react-router';
+import { Accounts } from 'meteor/accounts-base';
 
-class SignUp extends Component {
+export default class Signup extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: ''
+    };
+  }
+  onSubmit(e) {
+    e.preventDefault();
 
-    state = {
-        error: ''
+    let email = this.refs.email.value.trim();
+    let password = this.refs.password.value.trim();
+
+    if (password.length < 9) {
+      return this.setState({error: 'Password must be more than 8 characters long'});
     }
 
-    onSubmit = (e) => {
-        e.preventDefault();
+    Accounts.createUser({email, password}, (err) => {
+      if (err) {
+        this.setState({error: err.reason});
+      } else {
+        this.setState({error: ''});
+      }
+    });
+  }
+  render() {
+    return (
+      <div className="boxed-view">
+        <div className="boxed-view__box">
+          <h1>Join</h1>
 
-        let email = this.refs.email.value.trim();
-        let password = this.refs.password.value.trim();
+          {this.state.error ? <p>{this.state.error}</p> : undefined}
 
-        if(password.length < 9){
-            return this.setState({error:"please enter more than 8 chars"})
-        }
-        Accounts.createUser({email,password},(err) =>{
-            
-            if(err){
-               this.setState({error:err.reason}) 
-            }else{
-                this.setState({error:''}) 
-            }
-        })
+          <form onSubmit={this.onSubmit.bind(this)} noValidate className="boxed-view__form">
+            <input type="email" ref="email" name="email" placeholder="Email"/>
+            <input type="password" ref="password" name="password" placeholder="Password"/>
+            <button className="button">Create Account</button>
+          </form>
 
-    }
-    render() {
-        return (
-            <div className="boxed-view">
-            <div className="boxed-view__box">
-                <h1>Signup</h1>
-                <p>{this.state.error}</p>
-                <form onSubmit={this.onSubmit} noValidate className="boxed-view__form">
-                    <input ref="email" type="email" name="email"  placeholder="Email"  />
-                    <input  ref="password" type="password" name="password" placeholder="Password" />
-                    <button className="button">Create Account</button>
-                </form>
-
-
-                <Link to="/">Already lhave an account?</Link>
-
-            </div>
-            </div>
-        );
-    }
+          <Link to="/">Have an account?</Link>
+        </div>
+      </div>
+    );
+  }
 }
-
-export default SignUp;
